@@ -1,30 +1,28 @@
 package ai.neuronix.optimizer;
 
 import ai.neuronix.math.MatrixOperations;
-import ai.neuronix.nn.DenseLayer;
 
-public class SGDOptimizer {
+import java.util.List;
 
-    private final double learningRate;
+public final class SGDOptimizer implements Optimizer {
 
-    public SGDOptimizer(double learningRate) {
-        this.learningRate = learningRate;
+  private final double learningRate;
+
+  public SGDOptimizer(double learningRate) {
+    this.learningRate = learningRate;
+  }
+
+  @Override
+  public void step(List<Parameter> parameters) {
+
+    for (Parameter parameter : parameters) {
+
+      parameter.value(
+          MatrixOperations.subtract(
+              parameter.value(),
+              MatrixOperations.multiply(
+                  parameter.gradient(),
+                  learningRate)));
     }
-
-//    public void step(DenseLayer layer) {
-//
-//        layer.setWeights(
-//            MatrixOperations.subtract(
-//                layer.getWeights(),
-//                MatrixOperations.multiply(
-//                    layer.getWeightGradient(),
-//                    learningRate)));
-//
-//        layer.setBias(
-//            MatrixOperations.subtract(
-//                layer.getBias(),
-//                MatrixOperations.multiply(
-//                    layer.getBiasGradient(),
-//                    learningRate)));
-//    }
+  }
 }

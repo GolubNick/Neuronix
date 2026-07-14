@@ -1,24 +1,27 @@
 package ai.neuronix.loss;
 
 import ai.neuronix.math.Matrix;
+import ai.neuronix.math.MatrixOperations;
 
-public class MeanSquaredErrorLoss implements LossFunction {
+public final class CrossEntropyLoss implements LossFunction {
+
+  private static final double EPSILON = 1e-15;
 
   @Override
   public double calculate(Matrix predicted, Matrix expected) {
 
     validateDimensions(predicted, expected);
 
-    double sum = 0;
+    double loss = 0.0;
 
     for (int row = 0; row < predicted.rows(); row++) {
 
-      double difference = predicted.get(row, 0) - expected.get(row, 0);
+      double probability = Math.max(predicted.get(row, 0), EPSILON);
 
-      sum += difference * difference;
+      loss -= expected.get(row, 0) * Math.log(probability);
     }
 
-    return sum / predicted.rows();
+    return loss;
   }
 
   @Override
@@ -26,16 +29,7 @@ public class MeanSquaredErrorLoss implements LossFunction {
 
     validateDimensions(predicted, expected);
 
-    Matrix gradient = new Matrix(predicted.rows(), 1);
-
-    for (int row = 0; row < predicted.rows(); row++) {
-
-      double value = 2.0 * (predicted.get(row, 0) - expected.get(row, 0)) / predicted.rows();
-
-      gradient.set(row, 0, value);
-    }
-
-    return gradient;
+    return MatrixOperations.subtract(predicted, expected);
   }
 
   private void validateDimensions(Matrix predicted, Matrix expected) {

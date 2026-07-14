@@ -8,26 +8,15 @@ import org.junit.jupiter.api.Test;
 
 public class ReLULayerTest {
 
-    @Test
-    void shouldApplyRelu() {
+  @Test
+  void shouldApplyRelu() {
 
-        ReLULayer relu = new ReLULayer();
+    ReLULayer relu = new ReLULayer();
 
-        Matrix input = matrix(new double[][]{
-            {-2},
-            {-1},
-            {0},
-            {5}
-        });
+    Matrix input = matrix(new double[][] {{-2}, {-1}, {0}, {5}});
 
-        Matrix output = relu.forward(input);
+    Matrix output = relu.forward(input);
 
-        assertMatrixEquals(output, new double[][]{
-            {0},
-            {0},
-            {0},
-            {5}
-        });
-    }
-
+    assertMatrixEquals(output, new double[][] {{0}, {0}, {0}, {5}});
+  }
 }

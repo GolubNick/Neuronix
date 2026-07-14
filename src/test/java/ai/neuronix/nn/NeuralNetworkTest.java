@@ -8,26 +8,17 @@ import org.junit.jupiter.api.Test;
 
 public class NeuralNetworkTest {
 
-    @Test
-    void shouldExecuteLayersInOrder() {
+  @Test
+  void shouldExecuteLayersInOrder() {
 
-        NeuralNetwork network = new NeuralNetwork();
+    NeuralNetwork network = new NeuralNetwork();
 
-        network.add(new IncrementLayer())
-            .add(new IncrementLayer())
-            .add(new IncrementLayer());
+    network.add(new IncrementLayer()).add(new IncrementLayer()).add(new IncrementLayer());
 
-        Matrix input = matrix(new double[][]{
-            {1},
-            {2}
-        });
+    Matrix input = matrix(new double[][] {{1}, {2}});
 
-        Matrix output = network.forward(input);
+    Matrix output = network.forward(input);
 
-        assertMatrixEquals(output, new double[][]{
-            {4},
-            {5}
-        });
-    }
-
+    assertMatrixEquals(output, new double[][] {{4}, {5}});
+  }
 }

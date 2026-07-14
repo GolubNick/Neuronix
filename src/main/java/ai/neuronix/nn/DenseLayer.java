@@ -3,82 +3,98 @@ package ai.neuronix.nn;
 import ai.neuronix.math.Matrix;
 import ai.neuronix.math.MatrixFactory;
 import ai.neuronix.math.MatrixOperations;
+import ai.neuronix.optimizer.Parameter;
+import ai.neuronix.optimizer.Parameterized;
+import java.util.List;
 
-public class DenseLayer implements TrainableLayer, Trainable {
+public class DenseLayer implements TrainableLayer, Trainable, Parameterized {
 
-    private Matrix weights;
-    private Matrix bias;
+  private final Parameter weights;
+  private final Parameter bias;
 
-    private Matrix weightGradient;
-    private Matrix biasGradient;
+  private Matrix input;
 
-    private Matrix input;
+  public DenseLayer(int inputSize, int outputSize) {
+    this(
+        MatrixFactory.random(outputSize, inputSize),
+        MatrixFactory.zeros(outputSize, 1));
+  }
 
-    public DenseLayer(int inputSize, int outputSize) {
-        this(
-            MatrixFactory.random(outputSize, inputSize),
-            MatrixFactory.zeros(outputSize, 1)
-        );
+  public DenseLayer(Matrix weights, Matrix bias) {
+    this.weights = new Parameter(weights);
+    this.bias = new Parameter(bias);
+  }
+
+  @Override
+  public Matrix forward(Matrix input) {
+
+    Matrix weightMatrix = weights.value();
+
+    if (input.rows() != weightMatrix.columns()) {
+      throw new IllegalArgumentException(
+          String.format(
+              "Expected input vector with %d rows but got %d.",
+              weightMatrix.columns(),
+              input.rows()));
     }
 
-    public DenseLayer(Matrix weights, Matrix bias) {
-        this.weights = weights;
-        this.bias = bias;
-    }
+    this.input = input;
 
-    @Override
-    public Matrix forward(Matrix input) {
-        if (input.rows() != weights.columns()) {
-            throw new IllegalArgumentException(
-                String.format(
-                    "Expected input vector with %d rows but got %d.",
-                    weights.columns(),
-                    input.rows()));
-        }
+    Matrix output = MatrixOperations.multiply(weightMatrix, input);
 
-        this.input = input;
-        Matrix output = MatrixOperations.multiply(weights, input);
-        return MatrixOperations.add(output, bias);
-    }
+    return MatrixOperations.add(output, bias.value());
+  }
 
-    @Override
-    public Matrix backward(Matrix gradient) {
-        weightGradient = MatrixOperations.multiply(
-            gradient,
-            MatrixOperations.transpose(input));
+  @Override
+  public Matrix backward(Matrix gradient) {
 
-        biasGradient = gradient;
+    Matrix weightGradient =
+        MatrixOperations.multiply(gradient, MatrixOperations.transpose(input));
 
-        return MatrixOperations.multiply(
-            MatrixOperations.transpose(weights),
-            gradient);
-    }
+    weights.gradient(weightGradient);
+    bias.gradient(gradient);
 
-    @Override
-    public void update(double learningRate) {
+    return MatrixOperations.multiply(
+        MatrixOperations.transpose(weights.value()),
+        gradient);
+  }
 
-        weights = MatrixOperations.subtract(
-            weights,
-            MatrixOperations.multiply(weightGradient, learningRate));
+  @Override
+  public void update(double learningRate) {
 
-        bias = MatrixOperations.subtract(
-            bias,
-            MatrixOperations.multiply(biasGradient, learningRate));
-    }
+    weights.value(
+        MatrixOperations.subtract(
+            weights.value(),
+            MatrixOperations.multiply(
+                weights.gradient(),
+                learningRate)));
 
-    Matrix getWeights() {
-        return weights;
-    }
+    bias.value(
+        MatrixOperations.subtract(
+            bias.value(),
+            MatrixOperations.multiply(
+                bias.gradient(),
+                learningRate)));
+  }
 
-    Matrix getBias() {
-        return bias;
-    }
+  @Override
+  public List<Parameter> parameters() {
+    return List.of(weights, bias);
+  }
 
-    Matrix getWeightGradient() {
-        return weightGradient;
-    }
+  Matrix getWeights() {
+    return weights.value();
+  }
 
-    Matrix getBiasGradient() {
-        return biasGradient;
-    }
+  Matrix getBias() {
+    return bias.value();
+  }
+
+  Matrix getWeightGradient() {
+    return weights.gradient();
+  }
+
+  Matrix getBiasGradient() {
+    return bias.gradient();
+  }
 }

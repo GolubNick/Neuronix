@@ -2,7 +2,7 @@ package ai.neuronix.dataset;
 
 public interface Dataset {
 
-    int size();
+  int size();
 
-    TrainingSample get(int index);
+  TrainingSample get(int index);
 }

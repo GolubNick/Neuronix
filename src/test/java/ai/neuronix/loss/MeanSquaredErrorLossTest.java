@@ -8,40 +8,27 @@ import org.junit.jupiter.api.Test;
 
 public class MeanSquaredErrorLossTest {
 
-    @Test
-    void shouldCalculateMeanSquaredError() {
+  @Test
+  void shouldCalculateMeanSquaredError() {
 
-        MeanSquaredErrorLoss loss = new MeanSquaredErrorLoss();
+    MeanSquaredErrorLoss loss = new MeanSquaredErrorLoss();
 
-        Matrix predicted = matrix(new double[][]{
-            {2}
-        });
+    Matrix predicted = matrix(new double[][] {{2}});
 
-        Matrix expected = matrix(new double[][]{
-            {3}
-        });
+    Matrix expected = matrix(new double[][] {{3}});
 
-        assertThat(loss.calculate(predicted, expected))
-            .isEqualTo(1.0);
-    }
+    assertThat(loss.calculate(predicted, expected)).isEqualTo(1.0);
+  }
 
-    @Test
-    void shouldCalculateMeanSquaredErrorForVector() {
+  @Test
+  void shouldCalculateMeanSquaredErrorForVector() {
 
-        MeanSquaredErrorLoss loss = new MeanSquaredErrorLoss();
+    MeanSquaredErrorLoss loss = new MeanSquaredErrorLoss();
 
-        Matrix predicted = matrix(new double[][]{
-            {1},
-            {2}
-        });
+    Matrix predicted = matrix(new double[][] {{1}, {2}});
 
-        Matrix expected = matrix(new double[][]{
-            {2},
-            {4}
-        });
+    Matrix expected = matrix(new double[][] {{2}, {4}});
 
-        assertThat(loss.calculate(predicted, expected))
-            .isEqualTo(2.5);
-    }
-
+    assertThat(loss.calculate(predicted, expected)).isEqualTo(2.5);
+  }
 }

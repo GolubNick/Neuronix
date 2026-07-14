@@ -1,7 +1,3 @@
 package ai.neuronix.nn;
 
-public class DenseLayerTest {
-
-
-
-}
+public class DenseLayerTest {}

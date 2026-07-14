@@ -1,51 +1,55 @@
 package ai.neuronix.nn;
 
 import ai.neuronix.math.Matrix;
+import ai.neuronix.optimizer.Parameter;
+import ai.neuronix.optimizer.Parameterized;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
-public class NeuralNetwork implements Layer, Trainable {
+public class NeuralNetwork implements Layer {
 
-    private final List<Layer> layers = new ArrayList<>();
+  private final List<Layer> layers = new ArrayList<>();
 
-    public NeuralNetwork add(Layer layer) {
-        layers.add(layer);
-        return this;
+  public NeuralNetwork add(Layer layer) {
+    layers.add(layer);
+    return this;
+  }
+
+  @Override
+  public Matrix forward(Matrix input) {
+
+    Matrix output = input;
+
+    for (Layer layer : layers) {
+      output = layer.forward(output);
     }
 
-    @Override
-    public Matrix forward(Matrix input) {
+    return output;
+  }
 
-        Matrix output = input;
+  @Override
+  public Matrix backward(Matrix gradient) {
 
-        for (Layer layer : layers) {
-            output = layer.forward(output);
-        }
+    ListIterator<Layer> iterator = layers.listIterator(layers.size());
 
-        return output;
+    while (iterator.hasPrevious()) {
+      gradient = iterator.previous().backward(gradient);
     }
 
-    @Override
-    public Matrix backward(Matrix gradient) {
+    return gradient;
+  }
 
-        ListIterator<Layer> iterator = layers.listIterator(layers.size());
+  public List<Parameter> parameters() {
 
-        while (iterator.hasPrevious()) {
-            gradient = iterator.previous().backward(gradient);
-        }
+    List<Parameter> parameters = new ArrayList<>();
 
-        return gradient;
+    for (Layer layer : layers) {
+      if (layer instanceof Parameterized parameterized) {
+        parameters.addAll(parameterized.parameters());
+      }
     }
 
-    @Override
-    public void update(double learningRate) {
-
-        for (Layer layer : layers) {
-
-            if (layer instanceof Trainable trainable) {
-                trainable.update(learningRate);
-            }
-        }
-    }
+    return parameters;
+  }
 }
