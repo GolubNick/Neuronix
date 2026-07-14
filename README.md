@@ -1,3 +1,7 @@
+# License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
 # Neuronix
 
 Neuronix is a lightweight machine learning framework built from scratch in Java.
